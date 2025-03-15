@@ -135,6 +135,26 @@ Status menu(AddressBook *address_book)
 
 Status add_contacts(AddressBook *address_book)
 {
+	ContactInfo *temp;
+	int loop = 1;
+	int option;
+	do{
+		option = get_option(e_add_contact, scanf("Please select an option: "));
+		switch(option)
+		{
+			case 0:
+			loop = 0;
+			break;
+			case 1:
+			scanf("Enter The Name: ", temp->name);
+			case 2:
+			scanf("Enter The Phone Number: ", temp->phone_numbers);
+			case 3:
+			scanf("Enter The Email Address: ", temp->email_addresses);
+		}
+	int si_no = 0; //Nonfunctional here yet, need to figure this out to find how to append to the addressbook list.
+	}while(loop == 1);
+	return e_success;
 	/* Add the functionality for adding contacts here */
 }
 

@@ -6,11 +6,12 @@
 #include "address_book.h"
 #include "address_book_menu.h"
 
-//#include "abk_fileops.h"
+#include "address_book_fops.h"
 //#include "abk_log.h"
 //#include "abk_menus.h"
 //#include "abk.h"
 
+// TODO:
 int get_option(int type, const char *msg)
 {
 	/*
@@ -18,9 +19,28 @@ int get_option(int type, const char *msg)
 	 * Just an enter key detection
 	 * Read an number
 	 * Read a charcter
-	 */ 
+	 */
 
-	/* Fill the code to add above functionality */
+	int option;
+
+	printf("%s", msg);
+
+	switch (type) 
+	{
+		case NONE:
+			break;
+		case CHAR:
+			scanf("%c", (char *)&option);
+			break;
+		case NUM:
+			scanf("%d", &option);
+			break;
+		default:
+			printf("Invalid input.\n");
+			return -1;
+	}
+	
+	return option;
 }
 
 Status save_prompt(AddressBook *address_book)

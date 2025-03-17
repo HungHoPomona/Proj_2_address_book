@@ -11,7 +11,6 @@
 //#include "abk_menus.h"
 //#include "abk.h"
 
-// TODO:
 int get_option(int type, const char *msg)
 {
 	/*
@@ -170,7 +169,132 @@ Status search_contact(AddressBook *address_book)
 
 Status edit_contact(AddressBook *address_book)
 {
-	/* Add the functionality for edit contacts here */
+	int option;
+
+	do 
+	{
+		// Print edit menu
+		menu_header("Search Contact to Edit by:\n");
+
+		printf("0. Back\n");
+		printf("1. Name\n");
+		printf("2. Phone No\n");
+		printf("3. Email ID\n");
+		printf("4. Serial No\n");
+		printf("\n");
+		// End of edit menu
+		option = get_option(NUM, "Please select an option: ");
+		
+		switch (option) // search by option selected
+		{
+			case 0: // back
+				continue;	
+			case 1: // name
+				break;
+			case 2: // phone no 
+				break;
+			case 3: // email id 
+				break;
+			case 4: // serial no 
+				break;
+			default:
+				printf("Invalid input.\n");
+				continue;
+		}
+
+		/*
+			Format search results 
+		*/
+
+		// Editor options
+		char select_option;
+
+		do
+		{
+			select_option = get_option(CHAR, "Press [s] = Select. [q] | Cancel: ");
+
+			if (select_option == 's') 
+			{
+				int serial_selection = get_option(NUM, "Select a Serial Number (S.No) to Edit: ");
+				
+				/*
+					Fetch info based on serial number	
+				*/
+
+				// Edit contact menu
+				menu_header("Edit Contact:\n");
+				
+				printf("0. Back\n");
+				printf("1. Name : %s\n", /* Selection name */);
+				printf("2. Phone No 1 : %s\n", /* Selection number */);
+				printf("3. Email Id 1 : %s\n", /* Selection email */);
+				printf("\n");
+				// End of edit contact menu
+
+				int edit_option;
+				char edit_option_name[32];
+				int edit_index;
+				char edit_changes[32];
+
+				do
+				{
+					edit_option = get_option(NUM, "Please select an option: ");
+
+					switch (edit_option)
+					{
+						case 0: // Back
+							continue;	
+						case 1: // Name
+							break;
+						case 2: // Phone no
+							strcpy(edit_option_name, "Phone No");
+							break;
+						case 3: // Email id
+							strcpy(edit_option_name, "Email ID");
+							break;
+						default:
+							printf("Invalid input. Try again\n");
+							continue;
+					}
+
+					if (edit_option == 1) {
+						printf("Enter name: ");
+					}
+					else
+					{
+						do
+						{
+							printf("Enter %s index to be changed [Max 5]: ", edit_option_name);
+							edit_index = get_option(NUM, "");
+							if (edit_index <= 0 || edit_index >= 5)
+							{
+								printf("Invalid index. Try again\n");
+							}
+						} while (edit_index <= 0 || edit_index >= 5);
+
+						printf("Enter %s %d: ", edit_option_name, edit_index);
+					}
+
+					// May need to add check for valid input	
+					scanf("%s", edit_changes);
+					
+					/*
+						Save changes to database	
+					*/
+
+					} while (edit_option != 0);
+			
+			}
+			else if (select_option != 'q') 
+			{
+				printf("Invalid input. Try again\n");
+			}
+
+		} while (select_option != 's' || select_option != 'q');
+		
+	} while (option != e_back);
+
+	return e_success;
 }
 
 Status delete_contact(AddressBook *address_book)

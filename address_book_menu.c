@@ -167,6 +167,18 @@ Status search_contact(AddressBook *address_book)
 	/* Add the functionality for search contacts here */
 }
 
+void edit_print_result(AddressBook *address_book, int index)
+{
+	printf("%d | ", address_book->list[index].si_no);
+	for (int i = 0; i < 5; i++) // 5 is the max length	
+	{ 
+		if (i != 0) { printf("\t"); }
+		printf("%s | ", address_book->list[index].name[i]);
+		printf("%s | ", address_book->list[index].phone_numbers[i]);
+		printf("%s", address_book->list[index].email_addresses[i]);
+	}
+}
+
 Status edit_contact(AddressBook *address_book)
 {
 	int option;
@@ -185,26 +197,54 @@ Status edit_contact(AddressBook *address_book)
 		// End of edit menu
 		option = get_option(NUM, "Please select an option: ");
 		
-		switch (option) // search by option selected
+		int book_length = address_book->count;
+		int info_length;
+		char * search_pattern;
+		
+		printf("Enter a pattern: "); // TODO: replace pattern with name of search method
+		scanf("%s", search_pattern);
+	
+		for (int i = 0; i < book_length; i++) 
 		{
-			case 0: // back
-				continue;	
-			case 1: // name
-				break;
-			case 2: // phone no 
-				break;
-			case 3: // email id 
-				break;
-			case 4: // serial no 
-				break;
-			default:
-				printf("Invalid input.\n");
-				continue;
-		}
+			ContactInfo * contact = &address_book->list[i];
 
-		/*
-			Format search results 
-		*/
+			switch (option) // search by option selected
+			{
+				case 0: // back
+					continue;	
+				case 1: // name
+					if (strcmp(search_pattern, contact->name[0]) == 0)
+					{
+						edit_print_result(address_book, i);
+					}
+					break;
+				case 2: // phone no 
+					for (int j = 0; j < PHONE_NUMBER_COUNT; j++) {
+						if (strcmp(search_pattern, contact->phone_numbers[j]) == 0)
+						{
+							edit_print_result(address_book, i);
+						}
+					}
+					break;
+				case 3: // email id 
+					for (int j = 0; j < EMAIL_ID_COUNT; j++) {
+						if (strcmp(search_pattern, contact->email_addresses[j]) == 0)
+						{
+							edit_print_result(address_book, i);
+						}
+					}
+					break;
+				case 4: // serial no 
+					if (atoi(search_pattern) == contact->si_no)
+					{
+						edit_print_result(address_book, i);
+					}
+					break;
+				default:
+					printf("Invalid input.\n");
+					continue;
+				}
+		}
 
 		// Editor options
 		char select_option;

@@ -7,6 +7,7 @@
 #include <ctype.h>
 
 #include "address_book.h"
+#include "address_book_fops.h"
 
 Status load_file(AddressBook *address_book)
 {

@@ -256,25 +256,43 @@ Status edit_contact(AddressBook *address_book)
 			if (select_option == 's') 
 			{
 				int serial_selection = get_option(NUM, "Select a Serial Number (S.No) to Edit: ");
-				
+		
 				/*
-					Fetch info based on serial number	
-				*/
+					Check for invalid serial numbers	
+				*/				
+
+				int index;
+				for (index = 0; index < address_book->count; index++)
+				{ // NOTE: May not be necessary if si_no corresponds to its list index
+					if (serial_selection == address_book->list[index].si_no)	
+					{
+						break;
+					}
+				}
 
 				// Edit contact menu
 				menu_header("Edit Contact:\n");
 				
 				printf("0. Back\n");
-				printf("1. Name : %s\n", /* Selection name */);
-				printf("2. Phone No 1 : %s\n", /* Selection number */);
-				printf("3. Email Id 1 : %s\n", /* Selection email */);
+				printf("1. Name : %s\n", address_book->list[index].name[0]);
+				printf("2. Phone No ");
+				for (int i = 0; i < PHONE_NUMBER_COUNT; i++)
+				{
+					printf("%d : %s\n", 
+						i, address_book->list[index].phone_numbers[i]);
+				}
+				printf("3. Email Id ");
+				for (int i = 0; i < EMAIL_ID_COUNT; i++)
+				{
+					printf("%d : %s\n", 
+						i, address_book->list[index].email_addresses[i]);
+				}
 				printf("\n");
 				// End of edit contact menu
 
 				int edit_option;
-				char edit_option_name[32];
 				int edit_index;
-				char edit_changes[32];
+				char * edit_changes;
 
 				do
 				{
@@ -285,43 +303,43 @@ Status edit_contact(AddressBook *address_book)
 						case 0: // Back
 							continue;	
 						case 1: // Name
+							printf("Enter name: ");
+							scanf("%s", edit_changes);
+							strcpy(address_book->list[index].name[0], edit_changes);
 							break;
 						case 2: // Phone no
-							strcpy(edit_option_name, "Phone No");
+							do
+							{
+								edit_index = get_option(NUM, "Enter phone no index to be changed [Max 5]: ");
+								if (edit_index <= 0 || edit_index >= 5)
+								{
+									printf(" | Invalid index. Try again\n");
+								}
+							} while (edit_index <= 0 || edit_index >= 5);
+
+							printf("Enter phone no %d: ", edit_index);
+							scanf("%s", edit_changes);
+							strcpy(address_book->list[index].phone_numbers[edit_index], edit_changes);
 							break;
 						case 3: // Email id
-							strcpy(edit_option_name, "Email ID");
+							do
+							{
+								edit_index = get_option(NUM, "Enter email id index to be changed [Max 5]: ");
+								if (edit_index <= 0 || edit_index >= 5)
+								{
+									printf(" | Invalid index. Try again\n");
+								}
+							} while (edit_index <= 0 || edit_index >= 5);
+
+							printf("Enter email id %d: ", edit_index);
+							scanf("%s", edit_changes);
+							strcpy(address_book->list[index].email_addresses[edit_index], edit_changes);
 							break;
 						default:
 							printf("Invalid input. Try again\n");
 							continue;
 					}
-
-					if (edit_option == 1) {
-						printf("Enter name: ");
-					}
-					else
-					{
-						do
-						{
-							printf("Enter %s index to be changed [Max 5]: ", edit_option_name);
-							edit_index = get_option(NUM, "");
-							if (edit_index <= 0 || edit_index >= 5)
-							{
-								printf("Invalid index. Try again\n");
-							}
-						} while (edit_index <= 0 || edit_index >= 5);
-
-						printf("Enter %s %d: ", edit_option_name, edit_index);
-					}
-
-					// May need to add check for valid input	
-					scanf("%s", edit_changes);
 					
-					/*
-						Save changes to database	
-					*/
-
 					} while (edit_option != 0);
 			
 			}

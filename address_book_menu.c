@@ -80,14 +80,14 @@ Status save_prompt(AddressBook *address_book)
 Status list_contacts_2(AddressBook *address_book, const char *title, int *index, const char *msg, Modes mode)
 {
 	int page = 0;
-	int option;
+	int option = 1;
 
 	do
 	{
 		menu_header(title); // Use updated menu_header for screen clearing
-		printf("=====================================================================\n");
+		print_pattern();
 		printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
-		printf("=====================================================================\n");
+		print_pattern();
 
 		for (int i = page * 5; i < (page + 1) * 5 && i < address_book->count; i++)
 		{
@@ -98,7 +98,7 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 			       address_book->list[i].email_addresses[0]);
 		}
 
-		printf("=====================================================================\n");
+		print_pattern();
 		printf("Page %d of %d\n", page + 1, (address_book->count + 4) / 5);
 		printf("Options: [0] Exit | [1] Next Page | [2] Previous Page\n");
 
@@ -122,7 +122,18 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 			default:
 				printf("Invalid option. Try again.\n");
 		}
-	} while (1);
+        system("pause");
+    } while (option != 0);
+	return e_fail;
+}
+
+void print_pattern()
+{
+for(int a = 0; a < 115; a++)
+       {
+       printf("=");
+       }
+       printf("\n");
 }
 
 void menu_header(const char *str)

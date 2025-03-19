@@ -239,14 +239,6 @@ Status add_contacts(AddressBook *address_book)
     }
 
     ContactInfo new_contact;
-	for (int i = 0; i < 5; i++)
-		{
-			
-			       new_contact.name[i] = " ";
-			       new_contact.phone_numbers[i] = " "
-			       new_contact.eemail_addresses[i] = " "
-			       //Initialize blank values for initial contact
-		}
     printf("Enter Name: ");
     fgets(new_contact.name[0], NAME_LEN, stdin);
     new_contact.name[0][strcspn(new_contact.name[0], "\n")] = '\0'; // Remove newline character

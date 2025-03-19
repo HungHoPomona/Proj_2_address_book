@@ -81,6 +81,7 @@ Status save_prompt(AddressBook *address_book)
 Status list_contacts_2(AddressBook *address_book, const char *title, int *index, const char *msg, Modes mode)
 {
 	int option = 1;
+	int page = 0;
 	char *name = "";
 	char *phoneno = "";
 	char *emailaddresses = "";
@@ -98,32 +99,6 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 			       address_book->list[page].email_addresses[0]);
 		for (int i = 1; i < 5; i++)
 		{
-			//Begin checks & Assignment section
-			if (sizeof(address_book->list[page].name)/sizeof(address_book->list[page].name[0])
-			{
-				name = address_book->list[page].name[i];
-			}
-			else
-			{
-				name = "";
-			}
-			if (sizeof(address_book->list[page].phone_numbers)/sizeof(address_book->list[page].phone_numbers[0])
-			{
-				phoneno = address_book->list[page].phone_numbers[i];
-			}
-			else
-			{
-				phoneno = "";
-			}
-			if (sizeof(address_book->list[page].email_addresses)/sizeof(address_book->list[page].eemail_addresses[0])
-			{
-				emailaddresses = address_book->list[page].email_addresses[i];
-			}
-			else
-			{
-				emailaddresses = "";
-			}
-			//End of Checks & Assignment section
 			printf(": %6s : %32s : %32s : %32s :\n",
 			       " ",
 			       address_book->list[page].name[i],
@@ -235,9 +210,8 @@ Status menu(AddressBook *address_book)
 				break;
 			case e_list_contacts:
 				/* Add your implementation to call list_contacts function here */
-				//list_contacts(address_book, "List of Contacts", 0, "Press any key to continue...", e_list_contacts);
-				list_contacts_2(address_book, "List of Contacts", 0, NULL, e_list);
-				//Changing index to 0 for use in list_contacts_2 function.
+				//list_contacts(address_book, "List of Contacts", NULL, "Press any key to continue...", e_list_contacts);
+				list_contacts_2(address_book, "List of Contacts", NULL, NULL, e_list);
 				break;
 			case e_save:
 				save_file(address_book);
@@ -265,6 +239,14 @@ Status add_contacts(AddressBook *address_book)
     }
 
     ContactInfo new_contact;
+	for (int i = 0; i < 5; i++)
+		{
+			
+			       new_contact.name[i] = " ";
+			       new_contact.phone_numbers[i] = " "
+			       new_contact.eemail_addresses[i] = " "
+			       //Initialize blank values for initial contact
+		}
     printf("Enter Name: ");
     fgets(new_contact.name[0], NAME_LEN, stdin);
     new_contact.name[0][strcspn(new_contact.name[0], "\n")] = '\0'; // Remove newline character
@@ -293,6 +275,24 @@ Status search(const char *str, AddressBook *address_book, int loop_count, int fi
         if (strstr(address_book->list[i].name[0], str) != NULL)
         {
             printf("Found: %s\n", address_book->list[i].name[0]);
+		print_pattern();
+		printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
+		print_pattern();
+		printf(": %6d : %32s : %32s : %32s :\n",
+			       address_book->list[i].si_no,
+			       address_book->list[i].name[0],
+			       address_book->list[i].phone_numbers[0],
+			       address_book->list[i].email_addresses[0]);
+		for (int j = 1; j < 5; i++)
+		{
+			printf(": %6s : %32s : %32s : %32s :\n",
+			       " ",
+			       address_book->list[i].name[j],
+			       address_book->list[i].phone_numbers[j],
+			       address_book->list[i].email_addresses[j]);
+		}
+
+		print_pattern();
             return e_success;
         }
     }

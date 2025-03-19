@@ -80,8 +80,11 @@ Status save_prompt(AddressBook *address_book)
 
 Status list_contacts_2(AddressBook *address_book, const char *title, int *index, const char *msg, Modes mode)
 {
-	int page = 0;
+	int page = index;
 	int option = 1;
+	char *name = "";
+	char *phoneno = "";
+	char *emailaddresses = "";
 
 	do
 	{
@@ -89,18 +92,48 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 		print_pattern();
 		printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
 		print_pattern();
-
-		for (int i = page * 5; i < (page + 1) * 5 && i < address_book->count; i++)
+		printf(": %6d : %32s : %32s : %32s :\n",
+			       address_book->list[page].si_no,
+			       address_book->list[page].name[0],
+			       address_book->list[page].phone_numbers[0],
+			       address_book->list[page].email_addresses[0]);
+		for (int i = 1; i < 5; i++)
 		{
-			printf(": %6d : %32s : %32s : %32s :\n",
-			       address_book->list[i].si_no,
-			       address_book->list[i].name[0],
-			       address_book->list[i].phone_numbers[0],
-			       address_book->list[i].email_addresses[0]);
+			//Begin checks & Assignment section
+			if (address_book->list[page].name[i])
+			{
+				name = address_book->list[page].name[i];
+			}
+			else
+			{
+				name = "";
+			}
+			if (address_book->list[page].phone_numbers[i])
+			{
+				phoneno = address_book->list[page].phone_numbers[i];
+			}
+			else
+			{
+				phoneno = "";
+			}
+			if (address_book->list[page].email_addresses[i])
+			{
+				emailaddresses = address_book->list[page].phone_numbers[i];
+			}
+			else
+			{
+				emailaddresses = "";
+			}
+			//End of Checks & Assignment section
+			printf(": %6s : %32s : %32s : %32s :\n",
+			       " ",
+			       address_book->list[page].name[i],
+			       address_book->list[page].phone_numbers[i],
+			       address_book->list[page].email_addresses[i]);
 		}
 
 		print_pattern();
-		printf("Page %d of %d\n", page + 1, (address_book->count + 4) / 5);
+		printf("Page %d of %d\n", page + 1, (address_book->count));
 		printf("Options: [0] Exit | [1] Next Page | [2] Previous Page\n");
 
 		option = get_option(NUM, "Enter your choice: ");
@@ -109,7 +142,7 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 			case 0:
 				return e_success;
 			case 1:
-				if ((page + 1) * 5 < address_book->count)
+				if ((page + 1) < address_book->count)
 					page++;
 				else
 					printf("No more pages.\n");
@@ -203,8 +236,9 @@ Status menu(AddressBook *address_book)
 				break;
 			case e_list_contacts:
 				/* Add your implementation to call list_contacts function here */
-				//list_contacts(address_book, "List of Contacts", NULL, "Press any key to continue...", e_list_contacts);
-				list_contacts_2(address_book, "List of Contacts", NULL, NULL, e_list);
+				//list_contacts(address_book, "List of Contacts", 0, "Press any key to continue...", e_list_contacts);
+				list_contacts_2(address_book, "List of Contacts", 0, NULL, e_list);
+				//Changing index to 0 for use in list_contacts_2 function.
 				break;
 			case e_save:
 				save_file(address_book);

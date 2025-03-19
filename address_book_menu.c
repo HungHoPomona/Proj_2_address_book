@@ -82,9 +82,6 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 {
 	int option = 1;
 	int page = 0;
-	char *name = "";
-	char *phoneno = "";
-	char *emailaddresses = "";
 
 	do
 	{

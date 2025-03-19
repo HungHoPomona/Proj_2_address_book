@@ -171,11 +171,6 @@ void list_contacts(const AddressBook *address_book)
 	print_pattern();
 }
 
-void print_pattern()
-{
-    printf("==========================================================================================================================\n");
-}
-
 void free_address_book(AddressBook *address_book)
 {
     free(address_book->list);

@@ -80,7 +80,6 @@ Status save_prompt(AddressBook *address_book)
 
 Status list_contacts_2(AddressBook *address_book, const char *title, int *index, const char *msg, Modes mode)
 {
-	int page = index;
 	int option = 1;
 	char *name = "";
 	char *phoneno = "";
@@ -100,7 +99,7 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 		for (int i = 1; i < 5; i++)
 		{
 			//Begin checks & Assignment section
-			if (address_book->list[page].name[i])
+			if (sizeof(address_book->list[page].name)/sizeof(address_book->list[page].name[0])
 			{
 				name = address_book->list[page].name[i];
 			}
@@ -108,7 +107,7 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 			{
 				name = "";
 			}
-			if (address_book->list[page].phone_numbers[i])
+			if (sizeof(address_book->list[page].phone_numbers)/sizeof(address_book->list[page].phone_numbers[0])
 			{
 				phoneno = address_book->list[page].phone_numbers[i];
 			}
@@ -116,9 +115,9 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 			{
 				phoneno = "";
 			}
-			if (address_book->list[page].email_addresses[i])
+			if (sizeof(address_book->list[page].email_addresses)/sizeof(address_book->list[page].eemail_addresses[0])
 			{
-				emailaddresses = address_book->list[page].phone_numbers[i];
+				emailaddresses = address_book->list[page].email_addresses[i];
 			}
 			else
 			{

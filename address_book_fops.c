@@ -17,6 +17,7 @@ Status load_file(AddressBook *address_book)
 	/* 
 	 * Check for file existance
 	 */
+
 	if (ret == 0)
 	{
 		/* 
@@ -31,15 +32,15 @@ Status load_file(AddressBook *address_book)
         }
 
         /* Read the file and populate address_book */
-        address_book->count = 0;
-        while (!feof(address_book->fp))
+        address_book->count = 0; // Initialize count
+        while (fscanf(address_book->fp, "%[^,],%[^,],%[^\n]\n",
+                      address_book->list[address_book->count].name[0],
+                      address_book->list[address_book->count].phone_numbers[0],
+                      address_book->list[address_book->count].email_addresses[0]) == 3)
         {
-            ContactInfo contact;
-            if (fscanf(address_book->fp, "%[^,],%[^,],%[^\n]\n",
-                       contact.name[0], contact.phone_numbers[0], contact.email_addresses[0]) == 3)
-            {
-                address_book->list[address_book->count++] = contact;
-            }
+            address_book->list[address_book->count].si_no = address_book->count + 1;
+            address_book->count++;
+            if (address_book->count >= MAX_CONTACTS) break; // Prevent overflow
         }
         fclose(address_book->fp);
 
@@ -66,7 +67,9 @@ Status save_file(AddressBook *address_book)
 	 * Write contacts back to file.
 	 * Re write the complete file currently
 	 */ 
-	address_book->fp = fopen(DEFAULT_FILE, "w");
+
+	
+    address_book->fp = fopen(DEFAULT_FILE, "w");
 
 	if (address_book->fp == NULL)
 	{
@@ -77,7 +80,8 @@ Status save_file(AddressBook *address_book)
 	 * Add the logic to save the file
 	 * Make sure to do error handling
 	 */
-	for (int i = 0; i < address_book->count; i++)
+
+    for (int i = 0; i < address_book->count; i++)
     {
         fprintf(address_book->fp, "%s,%s,%s\n",
                 address_book->list[i].name[0],
@@ -141,15 +145,35 @@ Status delete_contact(AddressBook *address_book, int index)
     return e_success;
 }
 
+void print_pattern(); // Forward declaration of print_pattern
+
 void list_contacts(const AddressBook *address_book)
 {
-    for (int i = 0; i < address_book->count; i++)
-    {
-        printf("Name: %s\n", address_book->list[i].name[0]);
-        printf("Phone: %s\n", address_book->list[i].phone_numbers[0]);
-        printf("Email: %s\n", address_book->list[i].email_addresses[0]);
-        printf("\n");
-    }
+	if (address_book->count == 0)
+	{
+		printf("No contacts available.\n");
+		return;
+	}
+
+	print_pattern();
+	printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
+	print_pattern();
+
+	for (int i = 0; i < address_book->count; i++)
+	{
+		printf(": %6d : %32s : %32s : %32s :\n",
+		       address_book->list[i].si_no,
+		       address_book->list[i].name[0],
+		       address_book->list[i].phone_numbers[0],
+		       address_book->list[i].email_addresses[0]);
+	}
+
+	print_pattern();
+}
+
+void print_pattern()
+{
+    printf("==========================================================================================================================\n");
 }
 
 void free_address_book(AddressBook *address_book)

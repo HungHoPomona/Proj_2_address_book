@@ -22,11 +22,14 @@ int get_option(int type, const char *msg)
 	 */ 
 
 	/* Fill the code to add above functionality */
-    char input[32];
+	char input[32];
     int option = -1;
 
     printf("%s", msg);
-    fgets(input, sizeof(input), stdin);
+    if (fgets(input, sizeof(input), stdin) == NULL)
+	{
+		return -1; // Handle EOF or input error
+	}
 
     if (type == NUM)
     {
@@ -54,9 +57,19 @@ Status save_prompt(AddressBook *address_book)
 		{
 			save_file(address_book);
 			printf("Exiting. Data saved in %s\n", DEFAULT_FILE);
-
+			system("pause");
 			break;
 		}
+		else if (option == 'N')
+		{
+			printf("Exiting without saving.\n");
+			break;
+		}
+		else
+		{
+			printf("Invalid option. Please enter 'Y' or 'N'.\n");
+		}
+
 	} while (option != 'N');
 
 	free(address_book->list);
@@ -66,18 +79,50 @@ Status save_prompt(AddressBook *address_book)
 
 Status list_contacts_2(AddressBook *address_book, const char *title, int *index, const char *msg, Modes mode)
 {
-	/* 
-	 * Add code to list all the contacts availabe in address_book.csv file
-	 * Should be menu based
-	 * The menu provide navigation option if the entries increase the page size
-	 */ 
+	int page = 0;
+	int option;
 
-     printf("%s\n", title);
-     for (int i = 0; i < address_book->count; i++)
-     {
-         printf("%d. %s\n", i + 1, address_book->list[i].name[0]);
-     }
-     return e_success;
+	do
+	{
+		menu_header(title); // Use updated menu_header for screen clearing
+		printf("=====================================================================\n");
+		printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
+		printf("=====================================================================\n");
+
+		for (int i = page * 5; i < (page + 1) * 5 && i < address_book->count; i++)
+		{
+			printf(": %6d : %32s : %32s : %32s :\n",
+			       address_book->list[i].si_no,
+			       address_book->list[i].name[0],
+			       address_book->list[i].phone_numbers[0],
+			       address_book->list[i].email_addresses[0]);
+		}
+
+		printf("=====================================================================\n");
+		printf("Page %d of %d\n", page + 1, (address_book->count + 4) / 5);
+		printf("Options: [0] Exit | [1] Next Page | [2] Previous Page\n");
+
+		option = get_option(NUM, "Enter your choice: ");
+		switch (option)
+		{
+			case 0:
+				return e_success;
+			case 1:
+				if ((page + 1) * 5 < address_book->count)
+					page++;
+				else
+					printf("No more pages.\n");
+				break;
+			case 2:
+				if (page > 0)
+					page--;
+				else
+					printf("Already on the first page.\n");
+				break;
+			default:
+				printf("Invalid option. Try again.\n");
+		}
+	} while (1);
 }
 
 void menu_header(const char *str)
@@ -87,10 +132,11 @@ void menu_header(const char *str)
 	system("cls");
 
 	printf("#######  Address Book  #######\n");
-	if (str != '\0')
+	if (str != NULL)
 	{
 		printf("#######  %s\n", str);
 	}
+
 }
 
 void main_menu(void)
@@ -131,6 +177,7 @@ Status menu(AddressBook *address_book)
 		{
 			case e_add_contact:
 				/* Add your implementation to call add_contacts function here */
+				add_contacts(address_book);
 				break;
 			case e_search_contact:
 				search_contact_2(address_book);
@@ -142,16 +189,21 @@ Status menu(AddressBook *address_book)
 				delete_contact_2(address_book);
 				break;
 			case e_list_contacts:
-                //list_contacts(address_book, "List of Contacts", NULL, "Press any key to continue...", e_list_contacts);
+				/* Add your implementation to call list_contacts function here */
+				//list_contacts(address_book, "List of Contacts", NULL, "Press any key to continue...", e_list_contacts);
 				list_contacts_2(address_book, "List of Contacts", NULL, NULL, e_list);
-                system("pause");
 				break;
 			case e_save:
 				save_file(address_book);
 				break;
 			case e_exit:
+				exit(0);
 				break;
 		}
+
+		system("pause");
+		system("cls");
+
 	} while (option != e_exit);
 
 	return e_success;
@@ -160,7 +212,7 @@ Status menu(AddressBook *address_book)
 Status add_contacts(AddressBook *address_book)
 {
 	/* Add the functionality for adding contacts here */
-    if (address_book->count >= 100) // Assuming a maximum of 100 contacts
+	if (address_book->count >= 100) // Assuming a maximum of 100 contacts
     {
         printf("Address book is full!\n");
         return e_fail;
@@ -183,13 +235,14 @@ Status add_contacts(AddressBook *address_book)
     address_book->list[address_book->count] = new_contact;
     address_book->count++;
 
+	printf("Contact added successfully!\n");
     return e_success;
 }
 
 Status search(const char *str, AddressBook *address_book, int loop_count, int field, const char *msg, Modes mode)
 {
 	/* Add the functionality for adding contacts here */
-    for (int i = 0; i < address_book->count; i++)
+	for (int i = 0; i < address_book->count; i++)
     {
         if (strstr(address_book->list[i].name[0], str) != NULL)
         {
@@ -205,6 +258,7 @@ Status search(const char *str, AddressBook *address_book, int loop_count, int fi
 Status search_contact_2(AddressBook *address_book)
 {
 	/* Add the functionality for search contacts here */
+	// Add the functionality for searching contacts here
     // Example:
     char search_str[NAME_LEN];
     printf("Enter name to search: ");
@@ -216,7 +270,8 @@ Status search_contact_2(AddressBook *address_book)
 
 Status edit_contact_2(AddressBook *address_book)
 {
-    /* Add the functionality for edit contacts here */
+	/* Add the functionality for edit contacts here */
+    
 	int index;
     printf("Enter contact index to edit: ");
     scanf("%d", &index);
@@ -259,12 +314,184 @@ Status edit_contact_2(AddressBook *address_book)
     }
 
     return e_success;
+	
+   int option;
+
+	do 
+	{
+		// Print edit menu
+		menu_header("Search Contact to Edit by:\n");
+
+		printf("0. Back\n");
+		printf("1. Name\n");
+		printf("2. Phone No\n");
+		printf("3. Email ID\n");
+		printf("4. Serial No\n");
+		printf("\n");
+		// End of edit menu
+		option = get_option(NUM, "Please select an option: ");
+		
+		int book_length = address_book->count;
+		int info_length;
+		char * search_pattern;
+		
+		printf("Enter a pattern: "); // TODO: replace pattern with name of search method
+		scanf("%s", search_pattern);
+	
+		for (int i = 0; i < book_length; i++) 
+		{
+			ContactInfo * contact = &address_book->list[i];
+
+			switch (option) // search by option selected
+			{
+				case 0: // back
+					continue;	
+				case 1: // name
+					if (strcmp(search_pattern, contact->name[0]) == 0)
+					{
+						edit_print_result(address_book, i);
+					}
+					break;
+				case 2: // phone no 
+					for (int j = 0; j < PHONE_NUMBER_COUNT; j++) {
+						if (strcmp(search_pattern, contact->phone_numbers[j]) == 0)
+						{
+							edit_print_result(address_book, i);
+						}
+					}
+					break;
+				case 3: // email id 
+					for (int j = 0; j < EMAIL_ID_COUNT; j++) {
+						if (strcmp(search_pattern, contact->email_addresses[j]) == 0)
+						{
+							edit_print_result(address_book, i);
+						}
+					}
+					break;
+				case 4: // serial no 
+					if (atoi(search_pattern) == contact->si_no)
+					{
+						edit_print_result(address_book, i);
+					}
+					break;
+				default:
+					printf("Invalid input.\n");
+					continue;
+				}
+		}
+
+		// Editor options
+		char select_option;
+
+		do
+		{
+			select_option = get_option(CHAR, "Press [s] = Select. [q] | Cancel: ");
+
+			if (select_option == 's') 
+			{
+				int serial_selection = get_option(NUM, "Select a Serial Number (S.No) to Edit: ");
+		
+				/*
+					Check for invalid serial numbers	
+				*/				
+
+				int index;
+				for (index = 0; index < address_book->count; index++)
+				{ // NOTE: May not be necessary if si_no corresponds to its list index
+					if (serial_selection == address_book->list[index].si_no)	
+					{
+						break;
+					}
+				}
+
+				// Edit contact menu
+				menu_header("Edit Contact:\n");
+				
+				printf("0. Back\n");
+				printf("1. Name : %s\n", address_book->list[index].name[0]);
+				printf("2. Phone No ");
+				for (int i = 0; i < PHONE_NUMBER_COUNT; i++)
+				{
+					printf("%d : %s\n", 
+						i, address_book->list[index].phone_numbers[i]);
+				}
+				printf("3. Email Id ");
+				for (int i = 0; i < EMAIL_ID_COUNT; i++)
+				{
+					printf("%d : %s\n", 
+						i, address_book->list[index].email_addresses[i]);
+				}
+				printf("\n");
+				// End of edit contact menu
+
+				int edit_option;
+				int edit_index;
+				char * edit_changes;
+
+				do
+				{
+					edit_option = get_option(NUM, "Please select an option: ");
+
+					switch (edit_option)
+					{
+						case 0: // Back
+							continue;	
+						case 1: // Name
+							printf("Enter name: ");
+							scanf("%s", edit_changes);
+							strcpy(address_book->list[index].name[0], edit_changes);
+							break;
+						case 2: // Phone no
+							do
+							{
+								edit_index = get_option(NUM, "Enter phone no index to be changed [Max 5]: ");
+								if (edit_index <= 0 || edit_index >= 5)
+								{
+									printf(" | Invalid index. Try again\n");
+								}
+							} while (edit_index <= 0 || edit_index >= 5);
+
+							printf("Enter phone no %d: ", edit_index);
+							scanf("%s", edit_changes);
+							strcpy(address_book->list[index].phone_numbers[edit_index], edit_changes);
+							break;
+						case 3: // Email id
+							do
+							{
+								edit_index = get_option(NUM, "Enter email id index to be changed [Max 5]: ");
+								if (edit_index <= 0 || edit_index >= 5)
+								{
+									printf(" | Invalid index. Try again\n");
+								}
+							} while (edit_index <= 0 || edit_index >= 5);
+
+							printf("Enter email id %d: ", edit_index);
+							scanf("%s", edit_changes);
+							strcpy(address_book->list[index].email_addresses[edit_index], edit_changes);
+							break;
+						default:
+							printf("Invalid input. Try again\n");
+							continue;
+					}
+					
+					} while (edit_option != 0);
+			
+			}
+			else if (select_option != 'q') 
+			{
+				printf("Invalid input. Try again\n");
+			}
+
+		} while (select_option != 's' || select_option != 'q');
+		
+	} while (option != e_back);
+
+	return e_success;
 }
 
 Status delete_contact_2(AddressBook *address_book)
 {
 	/* Add the functionality for delete contacts here */
-    /* Add the functionality for delete contacts here */
 
 	int index;
     printf("Enter contact index to delete: ");
@@ -284,4 +511,16 @@ Status delete_contact_2(AddressBook *address_book)
     address_book->count--;
 
     return e_success;
+}
+
+void edit_print_result(AddressBook *address_book, int index)
+{
+	printf("%d | ", address_book->list[index].si_no);
+	for (int i = 0; i < 5; i++) // 5 is the max length	
+	{ 
+		if (i != 0) { printf("\t"); }
+		printf("%s | ", address_book->list[index].name[i]);
+		printf("%s | ", address_book->list[index].phone_numbers[i]);
+		printf("%s", address_book->list[index].email_addresses[i]);
+	}
 }

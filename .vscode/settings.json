@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "address_book.h": "c",
+        "address_book_menu.h": "c"
+    }
+}

@@ -96,8 +96,7 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 			       address_book->list[page].email_addresses[0]);
 		for (int i = 1; i < 5; i++)
 		{
-			printf(": %6s : %32s : %32s : %32s :\n",
-			       " ",
+			printf(":        : %32s : %32s : %32s :\n",
 			       address_book->list[page].name[i],
 			       address_book->list[page].phone_numbers[i],
 			       address_book->list[page].email_addresses[i]);

@@ -26,5 +26,5 @@ int get_option(int type, const char *msg);
 bool_t is_valid_phone_number(const char *phone);
 void format_phone_number(char *phone);
 bool_t is_valid_email(const char *email);
- 
+
 #endif

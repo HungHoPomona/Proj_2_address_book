@@ -37,22 +37,30 @@ Status load_file(AddressBook *address_book)
         return e_fail;
     }
 
-    address_book->count = 0; // Initialize count to 0
-    while (address_book->count < MAX_CONTACTS)
+    // Preallocate memory for contacts
+    address_book->list = (ContactInfo *)malloc(MAX_CONTACTS * sizeof(ContactInfo));
+    if (address_book->list == NULL)
     {
-        ContactInfo *contact = &address_book->list[address_book->count];
-        memset(contact, 0, sizeof(ContactInfo)); // Initialize memory to zero
+        perror("Error allocating memory for contacts");
+        fclose(address_book->fp);
+        return e_fail;
+    }
 
-        char line[1024];
-        if (fgets(line, sizeof(line), address_book->fp) == NULL)
-            break; // Stop if end of file is reached
+    address_book->count = 0; // Initialize count to 0
+    char line[1024];
 
+    while (fgets(line, sizeof(line), address_book->fp) != NULL && address_book->count < MAX_CONTACTS)
+    {
         // Skip empty lines
         if (line[0] == '\n' || line[0] == '\r')
             continue;
 
+        ContactInfo *contact = &address_book->list[address_book->count];
+        memset(contact, 0, sizeof(ContactInfo)); // Initialize memory to zero
+
         char *token = strtok(line, ",");
         int field_index = 0;
+        int phone_index = 0, email_index = 0;
 
         while (token != NULL)
         {
@@ -63,30 +71,19 @@ Status load_file(AddressBook *address_book)
                 strncpy(contact->name[0], token, NAME_LEN - 1);
                 contact->name[0][NAME_LEN - 1] = '\0';
             }
-            else if (field_index >= 1 && field_index <= PHONE_NUMBER_COUNT) // Phone numbers
+            else if (field_index >= 1) // Phone numbers or email addresses
             {
-                strncpy(contact->phone_numbers[field_index - 1], token, NUMBER_LEN - 1);
-                contact->phone_numbers[field_index - 1][NUMBER_LEN - 1] = '\0';
-                if (!is_valid_phone_number(contact->phone_numbers[field_index - 1]))
+                if (is_valid_phone_number(token) && phone_index < PHONE_NUMBER_COUNT)
                 {
-                    printf("Warning: Skipping invalid phone number '%s'.\n", contact->phone_numbers[field_index - 1]);
-                    contact->phone_numbers[field_index - 1][0] = '\0'; // Clear invalid phone number
+                    strncpy(contact->phone_numbers[phone_index], token, NUMBER_LEN - 1);
+                    contact->phone_numbers[phone_index][NUMBER_LEN - 1] = '\0';
+                    phone_index++;
                 }
-                else
+                else if (is_valid_email(token) && email_index < EMAIL_ID_COUNT)
                 {
-                    format_phone_number(contact->phone_numbers[field_index - 1]); // Format to XXX-XXX-XXXX
-                }
-            }
-            else if (field_index > PHONE_NUMBER_COUNT &&
-                     field_index <= PHONE_NUMBER_COUNT + EMAIL_ID_COUNT) // Email addresses
-            {
-                int email_index = field_index - PHONE_NUMBER_COUNT - 1;
-                strncpy(contact->email_addresses[email_index], token, EMAIL_ID_LEN - 1);
-                contact->email_addresses[email_index][EMAIL_ID_LEN - 1] = '\0';
-                if (!is_valid_email(contact->email_addresses[email_index]))
-                {
-                    printf("Warning: Skipping invalid email address '%s'.\n", contact->email_addresses[email_index]);
-                    contact->email_addresses[email_index][0] = '\0'; // Clear invalid email address
+                    strncpy(contact->email_addresses[email_index], token, EMAIL_ID_LEN - 1);
+                    contact->email_addresses[email_index][EMAIL_ID_LEN - 1] = '\0';
+                    email_index++;
                 }
             }
 
@@ -98,11 +95,12 @@ Status load_file(AddressBook *address_book)
         if (strlen(contact->name[0]) == 0)
         {
             printf("Warning: Skipping invalid contact with no name.\n");
-            continue; // Skip invalid contact
         }
-
-        contact->si_no = address_book->count + 1; // Assign serial number
-        address_book->count++;
+        else
+        {
+            contact->si_no = address_book->count + 1; // Assign serial number
+            address_book->count++;
+        }
     }
 
     fclose(address_book->fp);
@@ -128,19 +126,13 @@ Status save_file(AddressBook *address_book)
         // Save up to 5 phone numbers
         for (int j = 0; j < PHONE_NUMBER_COUNT; j++)
         {
-            if (strlen(contact->phone_numbers[j]) > 0)
-                fprintf(address_book->fp, "%s,", contact->phone_numbers[j]);
-            else
-                fprintf(address_book->fp, ","); // Empty field
+            fprintf(address_book->fp, "%s,", contact->phone_numbers[j]);
         }
 
         // Save up to 5 email addresses
         for (int j = 0; j < EMAIL_ID_COUNT; j++)
         {
-            if (strlen(contact->email_addresses[j]) > 0)
-                fprintf(address_book->fp, "%s,", contact->email_addresses[j]);
-            else
-                fprintf(address_book->fp, ","); // Empty field
+            fprintf(address_book->fp, "%s,", contact->email_addresses[j]);
         }
 
         fprintf(address_book->fp, "\n"); // End of contact

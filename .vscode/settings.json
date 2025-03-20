@@ -2,6 +2,7 @@
     "files.associations": {
         "stdio.h": "c",
         "address_book.h": "c",
-        "address_book_menu.h": "c"
+        "address_book_menu.h": "c",
+        "ctype.h": "c"
     }
 }

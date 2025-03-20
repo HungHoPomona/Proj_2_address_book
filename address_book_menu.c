@@ -121,7 +121,7 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
 
         print_pattern();
         printf("Page %d of %d\n", page + 1, (address_book->count + WINDOW_SIZE - 1) / WINDOW_SIZE);
-        printf("Options: [0] Exit | [1] Next Page | [2] Previous Page\n");
+        printf("Options: [0] Back to main menu | [1] Next Page | [2] Previous Page\n");
 
         option = get_option(NUM, "Enter your choice: ");
         switch (option)
@@ -129,12 +129,14 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
             case 0:
                 return e_success;
             case 1:
+				system("cls");
                 if ((page + 1) * WINDOW_SIZE < address_book->count)
                     page++;
                 else
                     printf("No more pages.\n");
                 break;
             case 2:
+				system("cls");
                 if (page > 0)
                     page--;
                 else
@@ -143,8 +145,6 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
             default:
                 printf("Invalid option. Try again.\n");
         }
-		system("pause");
-		system("cls");
     } while (option != 0);
     return e_fail;
 }
@@ -391,14 +391,22 @@ Status search_contact_2(AddressBook *address_book)
     printf("1. ID\n");
     printf("2. Name\n");
     printf("3. Phone Number\n");
-    printf("4. Email Address\n");
+    printf("4. Email Address\n\n");
+	printf("0. Return to main menu\n");
     printf("Enter your choice: ");
     option = get_option(NUM, "");
 
-    char search_str[NAME_LEN];
-    printf("Enter search term: ");
-    fgets(search_str, sizeof(search_str), stdin);
-    search_str[strcspn(search_str, "\n")] = '\0'; // Remove newline character
+	char search_str[NAME_LEN];
+	if(option == '0') //back to main menu
+	{
+		return e_success;
+	}
+	else
+	{
+		printf("Enter search term: ");
+		fgets(search_str, sizeof(search_str), stdin);
+		search_str[strcspn(search_str, "\n")] = '\0'; // Remove newline character
+	}
 
     int found = 0;
     for (int i = 0; i < address_book->count; i++)
@@ -408,6 +416,8 @@ Status search_contact_2(AddressBook *address_book)
 
         switch (option)
         {
+			case 0: // Back to Main Menu
+                return e_success;
             case 1: // Search by ID
                 if (contact->si_no == atoi(search_str))
                     match = 1;
@@ -491,13 +501,15 @@ Status edit_contact_2(AddressBook *address_book)
         printf("1. Search by Name\n");
         printf("2. Search by Phone Number\n");
         printf("3. Search by Email Address\n");
-        printf("4. Search by Contact ID\n");
+        printf("4. Search by Contact ID\n\n");
         printf("0. Back to Main Menu\n");
         printf("Enter your choice: ");
         option = get_option(NUM, "");
 
         switch (option)
         {
+			case 0: // Back to Main Menu
+                return e_success;
             case 1: // Search by Name
             {
                 char name[NAME_LEN];
@@ -694,9 +706,6 @@ Status edit_contact_2(AddressBook *address_book)
                 break;
             }
 
-            case 0: // Back to Main Menu
-                return e_success;
-
             default:
                 printf("Invalid option. Try again.\n");
         }
@@ -710,7 +719,7 @@ Status edit_contact_2(AddressBook *address_book)
                 printf("\nEdit Options:\n");
                 printf("1. Edit Name\n");
                 printf("2. Edit Phone Numbers\n");
-                printf("3. Edit Email Addresses\n");
+                printf("3. Edit Email Addresses\n\n");
                 printf("0. Back to Search Menu\n");
                 printf("Enter your choice: ");
                 edit_option = get_option(NUM, "");
@@ -781,8 +790,8 @@ Status delete_contact_2(AddressBook *address_book)
         printf("1. Delete by Name\n");
         printf("2. Delete by Phone Number\n");
         printf("3. Delete by Email Address\n");
-        printf("4. Delete by Contact ID\n");
-        printf("0. Done\n");
+        printf("4. Delete by Contact ID\n\n");
+        printf("0. Back to main menu\n");
         printf("Enter your choice: ");
         option = get_option(NUM, "");
 
@@ -917,7 +926,7 @@ Status delete_contact_2(AddressBook *address_book)
             }
 
             case 0: // Done
-                printf("Finished deleting contacts.\n");
+                printf("Finished deleting contacts. Return to main menu.\n");
                 break;
 
             default:

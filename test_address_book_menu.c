@@ -22,47 +22,22 @@ void test_search_contact(AddressBook *address_book)
 void test_edit_contact(AddressBook *address_book)
 {
     printf("Testing edit_contact...\n");
-    if (address_book->count > 0)
-    {
-        strcpy(address_book->list[0].name[0], "Jane Doe");
-        printf("Contact edited successfully.\n");
-    }
-    else
-    {
-        printf("No contacts to edit.\n");
-    }
+    edit_contact_2(address_book);
+    printf("Contact edited successfully.\n");
 }
 
 void test_delete_contact(AddressBook *address_book)
 {
     printf("Testing delete_contact...\n");
-    if (address_book->count > 0)
-    {
-        for (int i = 0; i < address_book->count - 1; i++)
-        {
-            address_book->list[i] = address_book->list[i + 1];
-        }
-        address_book->count--;
-        printf("Contact deleted successfully.\n");
-    }
-    else
-    {
-        printf("No contacts to delete.\n");
-    }
+    delete_contact_2(address_book);
+    printf("Contact deleted successfully.\n");
 }
 
 void test_list_contacts(AddressBook *address_book)
 {
     printf("Testing list_contacts...\n");
-    if (address_book->count > 0)
-    {
-        list_contacts_2(address_book, "List of Contacts", NULL, NULL, e_list);
-        printf("Contacts listed successfully.\n");
-    }
-    else
-    {
-        printf("No contacts to list.\n");
-    }
+    list_contacts_2(address_book, "List of Contacts", NULL, NULL, e_list);
+    printf("Contacts listed successfully.\n");
 }
 
 void test_save_prompt(AddressBook *address_book)

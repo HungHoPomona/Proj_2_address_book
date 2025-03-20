@@ -80,52 +80,66 @@ Status save_prompt(AddressBook *address_book)
 
 Status list_contacts_2(AddressBook *address_book, const char *title, int *index, const char *msg, Modes mode)
 {
-	int page = 0;
-	int option = 1;
+    int page = 0;
+    int option = 1;
 
-	do
-	{
-		menu_header(title); // Use updated menu_header for screen clearing
-		print_pattern();
-		printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
-		print_pattern();
+    do
+    {
+        menu_header(title);
+        print_pattern();
+        printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
+        print_pattern();
 
-		for (int i = page * 5; i < (page + 1) * 5 && i < address_book->count; i++)
-		{
-			printf(": %6d : %32s : %32s : %32s :\n",
-			       address_book->list[i].si_no,
-			       address_book->list[i].name[0],
-			       address_book->list[i].phone_numbers[0],
-			       address_book->list[i].email_addresses[0]);
-		}
+        // Dynamically display contacts based on the current page
+        for (int i = page * WINDOW_SIZE; i < (page + 1) * WINDOW_SIZE && i < address_book->count; i++)
+        {
+            ContactInfo *contact = &address_book->list[i];
 
-		print_pattern();
-		printf("Page %d of %d\n", page + 1, (address_book->count + 4) / 5);
-		printf("Options: [0] Exit | [1] Next Page | [2] Previous Page\n");
+            // Print the primary name, phone number, and email address
+            printf(": %6d : %32s : %32s : %32s :\n",
+                   contact->si_no,
+                   contact->name[0],
+                   strlen(contact->phone_numbers[0]) > 0 ? contact->phone_numbers[0] : "",
+                   strlen(contact->email_addresses[0]) > 0 ? contact->email_addresses[0] : "");
 
-		option = get_option(NUM, "Enter your choice: ");
-		switch (option)
-		{
-			case 0:
-				return e_success;
-			case 1:
-				if ((page + 1) * 5 < address_book->count)
-					page++;
-				else
-					printf("No more pages.\n");
-				break;
-			case 2:
-				if (page > 0)
-					page--;
-				else
-					printf("Already on the first page.\n");
-				break;
-			default:
-				printf("Invalid option. Try again.\n");
-		}
+            // Print additional phone numbers and email addresses in separate rows
+            for (int j = 1; j < PHONE_NUMBER_COUNT || j < EMAIL_ID_COUNT; j++)
+            {
+                printf(": %6s : %32s : %32s : %32s :\n",
+                       "",
+                       "",
+                       j < PHONE_NUMBER_COUNT && strlen(contact->phone_numbers[j]) > 0 ? contact->phone_numbers[j] : "",
+                       j < EMAIL_ID_COUNT && strlen(contact->email_addresses[j]) > 0 ? contact->email_addresses[j] : "");
+            }
+        }
+
+        print_pattern();
+        printf("Page %d of %d\n", page + 1, (address_book->count + WINDOW_SIZE - 1) / WINDOW_SIZE);
+        printf("Options: [0] Exit | [1] Next Page | [2] Previous Page\n");
+
+        option = get_option(NUM, "Enter your choice: ");
+        switch (option)
+        {
+            case 0:
+                return e_success;
+            case 1:
+                if ((page + 1) * WINDOW_SIZE < address_book->count)
+                    page++;
+                else
+                    printf("No more pages.\n");
+                break;
+            case 2:
+                if (page > 0)
+                    page--;
+                else
+                    printf("Already on the first page.\n");
+                break;
+            default:
+                printf("Invalid option. Try again.\n");
+        }
         system("pause");
     } while (option != 0);
-	return e_fail;
+    return e_fail;
 }
 
 void print_pattern()
@@ -222,33 +236,114 @@ Status menu(AddressBook *address_book)
 	return e_success;
 }
 
+bool_t is_valid_phone_number(const char *phone)
+{
+    int len = strlen(phone);
+    if (len == 12 && phone[3] == '-' && phone[7] == '-') // Format: XXX-XXX-XXXX
+    {
+        for (int i = 0; i < len; i++)
+        {
+            if (i == 3 || i == 7) continue;
+            if (!isdigit(phone[i])) return 0;
+        }
+        return 1;
+    }
+    else if (len == 10) // Format: 10 digits
+    {
+        for (int i = 0; i < len; i++)
+        {
+            if (!isdigit(phone[i])) return 0;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+void format_phone_number(char *phone)
+{
+    if (strlen(phone) == 10) // Convert 10 digits to XXX-XXX-XXXX
+    {
+        char formatted[NUMBER_LEN];
+        snprintf(formatted, sizeof(formatted), "%.3s-%.3s-%.4s", phone, phone + 3, phone + 6);
+        strcpy(phone, formatted);
+    }
+}
+
+bool_t is_valid_email(const char *email)
+{
+    const char *at = strchr(email, '@');
+    const char *dot = strrchr(email, '.');
+    return (at && dot && at < dot); // Ensure '@' exists before the last '.'
+}
+
 Status add_contacts(AddressBook *address_book)
 {
-	/* Add the functionality for adding contacts here */
-	if (address_book->count >= 100) // Assuming a maximum of 100 contacts
+    if (address_book->count >= MAX_CONTACTS)
     {
         printf("Address book is full!\n");
         return e_fail;
     }
 
     ContactInfo new_contact;
+    memset(&new_contact, 0, sizeof(ContactInfo)); // Initialize memory to zero
+
+    // Input name
     printf("Enter Name: ");
     fgets(new_contact.name[0], NAME_LEN, stdin);
     new_contact.name[0][strcspn(new_contact.name[0], "\n")] = '\0'; // Remove newline character
+    if (strlen(new_contact.name[0]) == 0)
+    {
+        printf("Name cannot be empty.\n");
+        return e_fail;
+    }
 
-    printf("Enter Phone Number: ");
-    fgets(new_contact.phone_numbers[0], NUMBER_LEN, stdin);
-    new_contact.phone_numbers[0][strcspn(new_contact.phone_numbers[0], "\n")] = '\0'; // Remove newline character
+    // Input up to 5 phone numbers
+    for (int i = 0; i < PHONE_NUMBER_COUNT; i++)
+    {
+        printf("Enter Phone Number %d (press Enter to skip): ", i + 1);
+        fgets(new_contact.phone_numbers[i], NUMBER_LEN, stdin);
+        new_contact.phone_numbers[i][strcspn(new_contact.phone_numbers[i], "\n")] = '\0'; // Remove newline character
+        if (strlen(new_contact.phone_numbers[i]) == 0) break; // Stop if input is blank
 
-    printf("Enter Email Address: ");
-    fgets(new_contact.email_addresses[0], EMAIL_ID_LEN, stdin);
-    new_contact.email_addresses[0][strcspn(new_contact.email_addresses[0], "\n")] = '\0'; // Remove newline character
+        while (!is_valid_phone_number(new_contact.phone_numbers[i]))
+        {
+            printf("Invalid phone number. Must be 10 digits or in XXX-XXX-XXXX format. Try again.\n");
+            printf("Enter Phone Number %d (press Enter to skip): ", i + 1);
+            fgets(new_contact.phone_numbers[i], NUMBER_LEN, stdin);
+            new_contact.phone_numbers[i][strcspn(new_contact.phone_numbers[i], "\n")] = '\0'; // Remove newline character
+            if (strlen(new_contact.phone_numbers[i]) == 0) break; // Stop if input is blank
+        }
 
+        if (strlen(new_contact.phone_numbers[i]) == 0) break; // Stop if input is blank after validation loop
+        format_phone_number(new_contact.phone_numbers[i]); // Format to XXX-XXX-XXXX
+    }
+
+    // Input up to 5 email addresses
+    for (int i = 0; i < EMAIL_ID_COUNT; i++)
+    {
+        printf("Enter Email Address %d (press Enter to skip): ", i + 1);
+        fgets(new_contact.email_addresses[i], EMAIL_ID_LEN, stdin);
+        new_contact.email_addresses[i][strcspn(new_contact.email_addresses[i], "\n")] = '\0'; // Remove newline character
+        if (strlen(new_contact.email_addresses[i]) == 0) break; // Stop if input is blank
+
+        while (!is_valid_email(new_contact.email_addresses[i]))
+        {
+            printf("Invalid email address. Must contain '@' and a valid domain. Try again.\n");
+            printf("Enter Email Address %d (press Enter to skip): ", i + 1);
+            fgets(new_contact.email_addresses[i], EMAIL_ID_LEN, stdin);
+            new_contact.email_addresses[i][strcspn(new_contact.email_addresses[i], "\n")] = '\0'; // Remove newline character
+            if (strlen(new_contact.email_addresses[i]) == 0) break; // Stop if input is blank
+        }
+
+        if (strlen(new_contact.email_addresses[i]) == 0) break; // Stop if input is blank after validation loop
+    }
+
+    // Assign serial number and add the contact to the address book
     new_contact.si_no = address_book->count + 1;
     address_book->list[address_book->count] = new_contact;
     address_book->count++;
 
-	printf("Contact added successfully!\n");
+    printf("Contact added successfully!\n");
     return e_success;
 }
 

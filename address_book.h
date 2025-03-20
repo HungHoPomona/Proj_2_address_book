@@ -2,7 +2,7 @@
 #define ADDRESS_BOOK_H
 
 #define DEFAULT_FILE				"address_book.csv"
-#define MAX_CONTACTS 100  // Example value, you can adjust as needed
+#define MAX_CONTACTS 200 // Example value, you can adjust as needed
 
 /* Length of a contact name  */
 #define NAME_LEN					32

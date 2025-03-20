@@ -172,6 +172,9 @@ Status search_contact(AddressBook *address_book)
 
 void edit_print_result(AddressBook *address_book, int option, const char *search_pattern)
 {
+	menu_header("Search results:\n");
+	printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
+	printf("===================================================================================================================\n");
 	int has_results = 0;
 
 	for (int i = 0; i < address_book->count; i++) 
@@ -222,29 +225,28 @@ void edit_print_result(AddressBook *address_book, int option, const char *search
 
 		if (index != -1) 
 		{
-			printf("%5d | ", address_book->list[index].si_no);
-			for (int j = 0; j < 5; j++) // 5 is the max length	
-			{ 
-				if (j != 0) 
-				{ 
-					printf("%5s | ", " "); 
-					printf("%32s | ", " ");
-				}
-				else
-				{
-					printf("%32s | ", address_book->list[index].name[0]);
-				}
+			printf(": %6d : %32s : %32s : %32s :\n",
+				address_book->list[index].si_no,
+				address_book->list[index].name[0],
+				address_book->list[index].phone_numbers[0],
+				address_book->list[index].email_addresses[0]);
 
-				printf("%32s | ", address_book->list[index].phone_numbers[j]);
-				printf("%32s", address_book->list[index].email_addresses[j]);
-				printf("\n");
+			for (int j = 1; j < 5; j++) // 5 is the max length	
+			{ 
+				printf(": %6s : %32s : %32s : %32s :\n",
+					" ",
+					" ",
+					address_book->list[index].phone_numbers[j],
+					address_book->list[index].email_addresses[j]);
 			}
+			printf("===================================================================================================================\n");
 		}
 	}
 
 	if (has_results == 0)
 	{
-		printf("No results found.");
+		printf("No matching contacts found.\n");
+		printf("===================================================================================================================\n");
 	}
 }
 
@@ -392,7 +394,7 @@ Status edit_contact(AddressBook *address_book)
 				}
 				if (index == address_book->count)
 				{
-					printf("No such contact.");
+					printf("No such contact.\n");
 					continue;
 				}
 			

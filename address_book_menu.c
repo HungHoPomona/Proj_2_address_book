@@ -143,7 +143,8 @@ Status list_contacts_2(AddressBook *address_book, const char *title, int *index,
             default:
                 printf("Invalid option. Try again.\n");
         }
-        system("pause");
+		system("pause");
+		system("cls");
     } while (option != 0);
     return e_fail;
 }

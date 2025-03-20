@@ -170,7 +170,7 @@ Status search_contact(AddressBook *address_book)
 	return e_success;
 }
 
-void edit_print_result(AddressBook *address_book, int option, const char *search_pattern)
+void search_result(AddressBook *address_book, int option, const char *search_pattern)
 {
 	menu_header("Search results:\n");
 	printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
@@ -366,7 +366,7 @@ Status edit_contact(AddressBook *address_book)
 		printf("Enter a pattern: "); // TODO: replace pattern with name of search method
 		scanf("%s", search_pattern);
 	
-		edit_print_result(address_book, option, search_pattern);
+		search_result(address_book, option, search_pattern);
 
 		// Contact selection menu via serial number 
 		char select_option = 's';
@@ -378,10 +378,6 @@ Status edit_contact(AddressBook *address_book)
 			if (select_option == 's') 
 			{
 				int serial_selection = get_option(NUM, "Select a Serial Number (S.No) to Edit: ");
-		
-				/*
-					Check for invalid serial numbers	
-				*/				
 
 				int index;
 				for (index = 0; index < address_book->count; index++)
@@ -389,7 +385,7 @@ Status edit_contact(AddressBook *address_book)
 					if (serial_selection == address_book->list[index].si_no)	
 					{
 						edit_contact_editor(address_book, index); // Enter contact editor
-						break;
+						break; // halt search
 					}
 				}
 				if (index == address_book->count)
@@ -398,7 +394,7 @@ Status edit_contact(AddressBook *address_book)
 					continue;
 				}
 			
-				edit_print_result(address_book, option, search_pattern);		
+				search_result(address_book, option, search_pattern);		
 			}
 			else if (select_option != 's' && select_option != 'q') 
 			{
@@ -414,6 +410,101 @@ Status edit_contact(AddressBook *address_book)
 
 Status delete_contact(AddressBook *address_book)
 {
-	/* Add the functionality for delete contacts here */
-	return e_success;
+	int option;
+
+	do 
+	{
+		// Print delete menu
+		menu_header("Search Contact to Delete by:\n");
+
+		printf("0. Back\n");
+		printf("1. Name\n");
+		printf("2. Phone No\n");
+		printf("3. Email ID\n");
+		printf("4. Serial No\n");
+		printf("\n");
+		// End of delete menu
+		do
+		{
+			option = get_option(NUM, "Please select an option: ");
+			if (option < 0 || option > 4)
+			{
+				printf("Invalid input.\n");
+			}
+		} while (option < 0 || option > 4);
+	
+		if (option == 0)
+		{
+			continue;
+		}
+
+		char search_pattern[32];
+		
+		printf("Enter a pattern: "); // TODO: replace pattern with name of search method
+		scanf("%s", search_pattern);
+	
+		search_result(address_book, option, search_pattern);
+
+		// Contact selection menu via serial number 
+		char select_option = 's';
+
+		do
+		{
+			select_option = get_option(CHAR, "Press [s] = Select. [q] | Cancel: ");
+
+			if (select_option == 's') 
+			{
+				int serial_selection = get_option(NUM, "Select a Serial Number (S.No) to Delete: ");
+
+				int index;
+				for (index = 0; index < address_book->count; index++)
+				{ // NOTE: May not be necessary if si_no corresponds to its list index
+					if (serial_selection == address_book->list[index].si_no)	
+					{
+						// Delete contact preview
+						menu_header("Edit Contact:\n");
+						
+						printf("0. Back\n");
+						printf("1. %-10s : %s\n", "Name", address_book->list[index].name[0]);
+						printf("2. Phone No 1 : %s\n", address_book->list[index].phone_numbers[0]);
+						for (int i = 1; i < PHONE_NUMBER_COUNT; i++)
+						{
+							printf("%13d : %s\n", 
+								i+1, address_book->list[index].phone_numbers[i]);
+						}
+						printf("3. Email Id 1 : %s\n", address_book->list[index].email_addresses[0]);
+						for (int i = 1; i < EMAIL_ID_COUNT; i++)
+						{
+							printf("%13d : %s\n", 
+								i+1, address_book->list[index].email_addresses[i]);
+						}
+						printf("\n");
+						// End of delete contact preview 
+						
+						// Delete prompt
+						if (get_option(CHAR, "Enter 'Y' to delete. [Press any key to ignore]: ") == 'Y')
+						{ // set list entry to empty
+							address_book->list[index] = *(ContactInfo *)malloc(sizeof(ContactInfo));
+						}
+						
+						break; // halt search
+					}
+				}
+				// Serial number does not exist 
+				if (index == address_book->count)
+				{
+					printf("No such contact.\n");
+					continue;
+				}
+			
+				search_result(address_book, option, search_pattern);		
+			}
+			else if (select_option != 's' && select_option != 'q') 
+			{
+				printf("Invalid input. Try again\n");
+			}
+
+		} while (select_option != 'q');
+		
+	} while (option != 0);
 }

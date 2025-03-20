@@ -380,97 +380,56 @@ Status search(const char *str, AddressBook *address_book, int loop_count, int fi
 
 Status search_contact_2(AddressBook *address_book)
 {
-    if (address_book->count == 0)
-    {
-        printf("No contacts available.\n");
-        return e_fail;
-    }
-
-    int option;
-    printf("Search by:\n");
-    printf("1. ID\n");
-    printf("2. Name\n");
-    printf("3. Phone Number\n");
-    printf("4. Email Address\n");
-    printf("Enter your choice: ");
-    option = get_option(NUM, "");
-
     char search_str[NAME_LEN];
-    printf("Enter search term: ");
-    fgets(search_str, sizeof(search_str), stdin);
-    search_str[strcspn(search_str, "\n")] = '\0'; // Remove newline character
-
-    int found = 0;
-    for (int i = 0; i < address_book->count; i++)
-    {
-        ContactInfo *contact = &address_book->list[i];
-        int match = 0;
-
-        switch (option)
-        {
-            case 1: // Search by ID
-                if (contact->si_no == atoi(search_str))
-                    match = 1;
-                break;
-            case 2: // Search by Name
-                if (strstr(contact->name[0], search_str) != NULL)
-                    match = 1;
-                break;
-            case 3: // Search by Phone Number
-                for (int j = 0; j < PHONE_NUMBER_COUNT; j++)
-                {
-                    if (strlen(contact->phone_numbers[j]) > 0 &&
-                        strstr(contact->phone_numbers[j], search_str) != NULL)
-                    {
-                        match = 1;
-                        break;
-                    }
-                }
-                break;
-            case 4: // Search by Email Address
-                for (int j = 0; j < EMAIL_ID_COUNT; j++)
-                {
-                    if (strlen(contact->email_addresses[j]) > 0 &&
-                        strstr(contact->email_addresses[j], search_str) != NULL)
-                    {
-                        match = 1;
-                        break;
-                    }
-                }
-                break;
-            default:
-                printf("Invalid option.\n");
-                return e_fail;
-        }
-
-        if (match)
-        {
-            found = 1;
-            printf("\nContact Found:\n");
-            print_pattern();
-            printf(": %6s : %32s : %32s : %32s :\n", "S.No", "Name", "Phone No.", "Email ID");
-            print_pattern();
-            printf(": %6d : %32s : %32s : %32s :\n",
-                   contact->si_no,
-                   contact->name[0],
-                   strlen(contact->phone_numbers[0]) > 0 ? contact->phone_numbers[0] : "",
-                   strlen(contact->email_addresses[0]) > 0 ? contact->email_addresses[0] : "");
-            for (int j = 1; j < PHONE_NUMBER_COUNT || j < EMAIL_ID_COUNT; j++)
-            {
-                printf(": %6s : %32s : %32s : %32s :\n",
-                       "",
-                       "",
-                       j < PHONE_NUMBER_COUNT && strlen(contact->phone_numbers[j]) > 0 ? contact->phone_numbers[j] : "",
-                       j < EMAIL_ID_COUNT && strlen(contact->email_addresses[j]) > 0 ? contact->email_addresses[j] : "");
-            }
-            print_pattern();
-        }
-    }
-
-    if (!found)
-        printf("No matching contact found.\n");
-
-    return e_success;
+	int option, count = 0;
+ 
+	do
+	{
+	    menu_header("Search Contact");
+ 
+	    printf("Choose search criteria:\n");
+	    printf("1. Search by Name\n2. Search by Phone No\n3. Search by Email ID\n4. Back to Menu\n");
+	    option = get_option(NUM, "Enter your option: ");
+ 
+	    switch (option)
+	    {
+		   case 1:
+			  printf("Enter Name to search: ");
+			  fgets(search_str, NAME_LEN, stdin);
+			  search_str[strcspn(search_str, "\n")] = '\0'; 
+			  count = search(search_str, address_book, address_book->count, 0, NULL, e_search);
+			  break;
+ 
+		   case 2:
+			  printf("Enter Phone No to search: ");
+			  fgets(search_str, NUMBER_LEN, stdin);
+			  search_str[strcspn(search_str, "\n")] = '\0';
+			  count = search(search_str, address_book, address_book->count, 1, NULL, e_search);
+			  break;
+ 
+		   case 3:
+			  printf("Enter Email ID to search: ");
+			  fgets(search_str, EMAIL_ID_LEN, stdin);
+			  search_str[strcspn(search_str, "\n")] = '\0';
+			  count = search(search_str, address_book, address_book->count, 2, NULL, e_search);
+			  break;
+ 
+		   case 4:
+			  return e_success; // Exit search menu
+ 
+		   default:
+			  printf("Invalid option. Please try again.\n");
+	    }
+ 
+	    if (count == 0)
+	    {
+		   printf("No matching contacts found.\n");
+	    }
+ 
+	    system("pause");
+	} while (option != 4);
+ 
+	return e_success;
 }
 
 Status edit_contact_2(AddressBook *address_book)

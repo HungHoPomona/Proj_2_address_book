@@ -20,7 +20,6 @@ Status search_contact_2(AddressBook *address_book);
 Status edit_contact_2(AddressBook *address_book);
 Status delete_contact_2(AddressBook *address_book);
 Status list_contacts_2(AddressBook *address_book, const char *title, int *index, const char *msg, Modes mode);
-void edit_print_result(AddressBook *address_book, int index);
 int get_option(int type, const char *msg);
 
 bool_t is_valid_phone_number(const char *phone);

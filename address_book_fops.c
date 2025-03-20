@@ -168,12 +168,100 @@ Status search_contact(const AddressBook *address_book, const char *name, Contact
 
 Status edit_contact(AddressBook *address_book, int index, const ContactInfo *new_contact)
 {
-    if (index < 0 || index >= address_book->count)
+    if (address_book->count == 0)
     {
+        printf("No contacts available.\n");
         return e_fail;
     }
 
-    address_book->list[index] = *new_contact;
+    int option;
+    do
+    {
+        printf("\nEdit Options:\n");
+        printf("1. Edit by Name\n");
+        printf("2. Edit by Phone Numbers\n");
+        printf("3. Edit by Email Addresses\n");
+        printf("4. Select Contact by ID\n");
+        printf("0. Done\n");
+        printf("Enter your choice: ");
+        option = get_option(NUM, "");
+
+        switch (option)
+        {
+            case 1: // Edit Name
+                for (int i = 0; i < NAME_COUNT; i++)
+                {
+                    printf("Enter Name %d (leave blank to keep current): ", i + 1);
+                    char new_name[NAME_LEN];
+                    fgets(new_name, NAME_LEN, stdin);
+                    new_name[strcspn(new_name, "\n")] = '\0'; // Remove newline character
+                    if (strlen(new_name) > 0)
+                        strncpy(address_book->list[index].name[i], new_name, NAME_LEN - 1);
+                }
+                break;
+
+            case 2: // Edit Phone Numbers
+                for (int i = 0; i < PHONE_NUMBER_COUNT; i++)
+                {
+                    printf("Enter Phone Number %d (leave blank to keep current): ", i + 1);
+                    char new_phone[NUMBER_LEN];
+                    fgets(new_phone, NUMBER_LEN, stdin);
+                    new_phone[strcspn(new_phone, "\n")] = '\0'; // Remove newline character
+                    if (strlen(new_phone) > 0)
+                        strncpy(address_book->list[index].phone_numbers[i], new_phone, NUMBER_LEN - 1);
+                }
+                break;
+
+            case 3: // Edit Email Addresses
+                for (int i = 0; i < EMAIL_ID_COUNT; i++)
+                {
+                    printf("Enter Email Address %d (leave blank to keep current): ", i + 1);
+                    char new_email[EMAIL_ID_LEN];
+                    fgets(new_email, EMAIL_ID_LEN, stdin);
+                    new_email[strcspn(new_email, "\n")] = '\0'; // Remove newline character
+                    if (strlen(new_email) > 0)
+                        strncpy(address_book->list[index].email_addresses[i], new_email, EMAIL_ID_LEN - 1);
+                }
+                break;
+
+            case 4: // Select Contact by ID
+            {
+                printf("Enter contact ID to edit: ");
+                int id;
+                scanf("%d", &id);
+                getchar(); // Consume newline character
+
+                int found = 0;
+                for (int i = 0; i < address_book->count; i++)
+                {
+                    if (address_book->list[i].si_no == id)
+                    {
+                        index = i;
+                        found = 1;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    printf("No contact found with ID %d.\n", id);
+                }
+                else
+                {
+                    printf("Selected contact with ID %d: %s\n", id, address_book->list[index].name[0]);
+                }
+                break;
+            }
+
+            case 0: // Done
+                printf("Finished editing contact.\n");
+                break;
+
+            default:
+                printf("Invalid option. Try again.\n");
+        }
+    } while (option != 0);
+
     return e_success;
 }
 

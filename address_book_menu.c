@@ -534,6 +534,21 @@ Status edit_contact_2(AddressBook *address_book)
                 }
                 else
                 {
+                {
+                    if (strstr(address_book->list[i].name[0], name) != NULL)
+                    {
+                        index = i;
+                        found = 1;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    printf("No contact found with name '%s'.\n", name);
+                }
+                else
+                {
 					system("cls");
 					printf("\nContact Found:\n");
 					print_pattern();
@@ -556,6 +571,29 @@ Status edit_contact_2(AddressBook *address_book)
                 }
                 break;
             }
+
+            case 2: // Search by Phone Number
+            {
+                char phone[NUMBER_LEN];
+                printf("Enter the phone number to search: ");
+                fgets(phone, NUMBER_LEN, stdin);
+                phone[strcspn(phone, "\n")] = '\0'; // Remove newline character
+
+                int found = 0;
+                for (int i = 0; i < address_book->count; i++)
+                {
+                    for (int j = 0; j < PHONE_NUMBER_COUNT; j++)
+                    {
+                        if (strcmp(address_book->list[i].phone_numbers[j], phone) == 0)
+                        {
+                            index = i;
+                            found = 1;
+                            break;
+                        }
+                    }
+                    if (found) break;
+                }
+
 
             case 2: // Search by Phone Number
             {
@@ -607,6 +645,35 @@ Status edit_contact_2(AddressBook *address_book)
                 }
                 break;
             }
+
+            case 3: // Search by Email Address
+            {
+                char email[EMAIL_ID_LEN];
+                printf("Enter the email address to search: ");
+                fgets(email, EMAIL_ID_LEN, stdin);
+                email[strcspn(email, "\n")] = '\0'; // Remove newline character
+
+                int found = 0;
+                for (int i = 0; i < address_book->count; i++)
+                {
+                    for (int j = 0; j < EMAIL_ID_COUNT; j++)
+                    {
+                        if (strcmp(address_book->list[i].email_addresses[j], email) == 0)
+                        {
+                            index = i;
+                            found = 1;
+                            break;
+                        }
+                    }
+                    if (found) break;
+                }
+
+                if (!found)
+                {
+                    printf("No contact found with email address '%s'.\n", email);
+                }
+                else
+                {
 
             case 3: // Search by Email Address
             {
@@ -935,4 +1002,5 @@ Status delete_contact_2(AddressBook *address_book)
     } while (option != 0);
 
     return e_success;
+}
 }

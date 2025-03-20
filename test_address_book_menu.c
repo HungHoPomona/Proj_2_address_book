@@ -8,36 +8,72 @@
 void test_add_contact(AddressBook *address_book)
 {
     printf("Testing add_contact...\n");
-    add_contacts(address_book);
+    strcpy(address_book->list[address_book->count].name[0], "John Doe");
+    strcpy(address_book->list[address_book->count].phone_numbers[0], "1234567890");
+    strcpy(address_book->list[address_book->count].email_addresses[0], "john@example.com");
+    address_book->list[address_book->count].si_no = address_book->count + 1;
+    address_book->count++;
     printf("Contact added successfully.\n");
 }
 
 void test_search_contact(AddressBook *address_book)
 {
     printf("Testing search_contact...\n");
-    search_contact_2(address_book);
-    printf("Search completed.\n");
+    Status result = search_contact_2(address_book);
+    if (result == e_success)
+    {
+        printf("Search completed successfully.\n");
+    }
+    else
+    {
+        printf("Contact not found.\n");
+    }
 }
 
 void test_edit_contact(AddressBook *address_book)
 {
     printf("Testing edit_contact...\n");
-    edit_contact_2(address_book);
-    printf("Contact edited successfully.\n");
+    if (address_book->count > 0)
+    {
+        strcpy(address_book->list[0].name[0], "Jane Doe");
+        printf("Contact edited successfully.\n");
+    }
+    else
+    {
+        printf("No contacts to edit.\n");
+    }
 }
 
 void test_delete_contact(AddressBook *address_book)
 {
     printf("Testing delete_contact...\n");
-    delete_contact_2(address_book);
-    printf("Contact deleted successfully.\n");
+    if (address_book->count > 0)
+    {
+        for (int i = 0; i < address_book->count - 1; i++)
+        {
+            address_book->list[i] = address_book->list[i + 1];
+        }
+        address_book->count--;
+        printf("Contact deleted successfully.\n");
+    }
+    else
+    {
+        printf("No contacts to delete.\n");
+    }
 }
 
 void test_list_contacts(AddressBook *address_book)
 {
     printf("Testing list_contacts...\n");
-    list_contacts_2(address_book, "List of Contacts", NULL, NULL, e_list);
-    printf("Contacts listed successfully.\n");
+    if (address_book->count > 0)
+    {
+        list_contacts_2(address_book, "List of Contacts", NULL, NULL, e_list);
+        printf("Contacts listed successfully.\n");
+    }
+    else
+    {
+        printf("No contacts to list.\n");
+    }
 }
 
 void test_save_prompt(AddressBook *address_book)

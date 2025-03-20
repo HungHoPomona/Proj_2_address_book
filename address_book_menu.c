@@ -381,55 +381,72 @@ Status search(const char *str, AddressBook *address_book, int loop_count, int fi
 Status search_contact_2(AddressBook *address_book)
 {
     char search_str[NAME_LEN];
-	int option, count = 0;
- 
-	do
-	{
-	    menu_header("Search Contact");
- 
-	    printf("Choose search criteria:\n");
-	    printf("1. Search by Name\n2. Search by Phone No\n3. Search by Email ID\n4. Back to Menu\n");
-	    option = get_option(NUM, "Enter your option: ");
- 
-	    switch (option)
-	    {
-		   case 1:
-			  printf("Enter Name to search: ");
-			  fgets(search_str, NAME_LEN, stdin);
-			  search_str[strcspn(search_str, "\n")] = '\0'; 
-			  count = search(search_str, address_book, address_book->count, 0, NULL, e_search);
-			  break;
- 
-		   case 2:
-			  printf("Enter Phone No to search: ");
-			  fgets(search_str, NUMBER_LEN, stdin);
-			  search_str[strcspn(search_str, "\n")] = '\0';
-			  count = search(search_str, address_book, address_book->count, 1, NULL, e_search);
-			  break;
- 
-		   case 3:
-			  printf("Enter Email ID to search: ");
-			  fgets(search_str, EMAIL_ID_LEN, stdin);
-			  search_str[strcspn(search_str, "\n")] = '\0';
-			  count = search(search_str, address_book, address_book->count, 2, NULL, e_search);
-			  break;
- 
-		   case 4:
-			  return e_success; // Exit search menu
- 
-		   default:
-			  printf("Invalid option. Please try again.\n");
-	    }
- 
-	    if (count == 0)
-	    {
-		   printf("No matching contacts found.\n");
-	    }
- 
-	    system("pause");
-	} while (option != 4);
- 
-	return e_success;
+    int option, count = 0;
+    
+    do {
+        menu_header("Search Contact");
+        printf("Choose your option:\n");
+        printf("1. Search by Name\n2. Search by Phone No\n3. Search by Email Id\n4. Previous menu\n");
+        option = get_option(NUM, "Enter your option: ");
+
+        switch (option) {
+            case 1:
+                printf("Enter a Name to search: ");
+                fgets(search_str, NAME_LEN, stdin);
+                search_str[strcspn(search_str, "\n")] = '\0';
+                for (int i = 0; i < address_book->count; i++) {
+                    if (!strcmp(search_str, address_book->list[i].name[0])) {
+                        printf("Contact FOUND\nName    : %s\nPhone No: %s\nEmail Id: %s\n", 
+                               address_book->list[i].name[0],
+                               address_book->list[i].phone_numbers[0],
+                               address_book->list[i].email_addresses[0]);
+                        count++;
+                    }
+                }
+                break;
+            case 2:
+                printf("Enter a Phone No to search: ");
+                fgets(search_str, NUMBER_LEN, stdin);
+                search_str[strcspn(search_str, "\n")] = '\0';
+                for (int i = 0; i < address_book->count; i++) {
+                    if (!strcmp(search_str, address_book->list[i].phone_numbers[0])) {
+                        printf("Contact FOUND\nName    : %s\nPhone No: %s\nEmail Id: %s\n", 
+                               address_book->list[i].name[0],
+                               address_book->list[i].phone_numbers[0],
+                               address_book->list[i].email_addresses[0]);
+                        count++;
+                    }
+                }
+                break;
+            case 3:
+                printf("Enter an Email Id to search: ");
+                fgets(search_str, EMAIL_ID_LEN, stdin);
+                search_str[strcspn(search_str, "\n")] = '\0';
+                for (int i = 0; i < address_book->count; i++) {
+                    if (!strcmp(search_str, address_book->list[i].email_addresses[0])) {
+                        printf("Contact FOUND\nName    : %s\nPhone No: %s\nEmail Id: %s\n", 
+                               address_book->list[i].name[0],
+                               address_book->list[i].phone_numbers[0],
+                               address_book->list[i].email_addresses[0]);
+                        count++;
+                    }
+                }
+                break;
+            case 4:
+                return e_success;
+            default:
+                printf("Invalid option. Please try again.\n");
+        }
+
+        if (!count) {
+            printf("Contact NOT FOUND\n");
+        } else if (count > 1) {
+            printf("WARNING: Multiple contacts found with similar details.\n");
+        }
+
+    } while (option != 4);
+
+    return e_success;
 }
 
 Status edit_contact_2(AddressBook *address_book)

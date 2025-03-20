@@ -2,6 +2,7 @@
 #define ADDRESS_BOOK_H
 
 #define DEFAULT_FILE				"address_book.csv"
+#define MAX_CONTACTS 100  // Example value, you can adjust as needed
 
 /* Length of a contact name  */
 #define NAME_LEN					32
@@ -76,16 +77,5 @@ typedef struct
 	ContactInfo *list;
 	int count;	
 } AddressBook;
-
-
-/* Function prototypes */
-Status load_contacts(AddressBook *address_book, const char *filename);
-Status save_contacts(AddressBook *address_book, const char *filename);
-Status add_contact(AddressBook *address_book, const ContactInfo *contact);
-Status search_contact(const AddressBook *address_book, const char *name, ContactInfo *result);
-Status edit_contact(AddressBook *address_book, int index, const ContactInfo *new_contact);
-Status delete_contact(AddressBook *address_book, int index);
-void list_contacts(const AddressBook *address_book);
-void free_address_book(AddressBook *address_book);
 
 #endif

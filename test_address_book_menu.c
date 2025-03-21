@@ -3,68 +3,63 @@
 #include <string.h>
 #include "address_book.h"
 #include "address_book_menu.h"
-#include "address_book_fops.h"
 
-void test_add_contact(AddressBook *address_book)
+void test_add_contacts(AddressBook *address_book)
 {
-    printf("Testing add_contact...\n");
-    strcpy(address_book->list[address_book->count].name[0], "John Doe");
-    strcpy(address_book->list[address_book->count].phone_numbers[0], "1234567890");
-    strcpy(address_book->list[address_book->count].email_addresses[0], "john@example.com");
-    address_book->list[address_book->count].si_no = address_book->count + 1;
-    address_book->count++;
-    printf("Contact added successfully.\n");
+    printf("Testing add_contacts...\n");
+    add_contacts(address_book);
+    if (address_book->count > 0)
+    {
+        printf("Contact added successfully. Total contacts: %d\n", address_book->count);
+    }
+    else
+    {
+        printf("Failed to add contact.\n");
+    }
 }
 
-void test_search_contact(AddressBook *address_book)
+void test_search_contact_2(AddressBook *address_book)
 {
-    printf("Testing search_contact...\n");
-    Status result = search_contact_2(address_book);
-    if (result == e_success)
+    printf("Testing search_contact_2...\n");
+    if (search_contact_2(address_book) == e_success)
     {
         printf("Search completed successfully.\n");
     }
     else
     {
-        printf("Contact not found.\n");
+        printf("No matching contact found.\n");
     }
 }
 
-void test_edit_contact(AddressBook *address_book)
+void test_edit_contact_2(AddressBook *address_book)
 {
-    printf("Testing edit_contact...\n");
-    if (address_book->count > 0)
+    printf("Testing edit_contact_2...\n");
+    if (edit_contact_2(address_book) == e_success)
     {
-        strcpy(address_book->list[0].name[0], "Jane Doe");
         printf("Contact edited successfully.\n");
     }
     else
     {
-        printf("No contacts to edit.\n");
+        printf("Failed to edit contact.\n");
     }
 }
 
-void test_delete_contact(AddressBook *address_book)
+void test_delete_contact_2(AddressBook *address_book)
 {
-    printf("Testing delete_contact...\n");
-    if (address_book->count > 0)
+    printf("Testing delete_contact_2...\n");
+    if (delete_contact_2(address_book) == e_success)
     {
-        for (int i = 0; i < address_book->count - 1; i++)
-        {
-            address_book->list[i] = address_book->list[i + 1];
-        }
-        address_book->count--;
-        printf("Contact deleted successfully.\n");
+        printf("Contact deleted successfully. Total contacts: %d\n", address_book->count);
     }
     else
     {
-        printf("No contacts to delete.\n");
+        printf("Failed to delete contact or no contacts available.\n");
     }
 }
 
-void test_list_contacts(AddressBook *address_book)
+void test_list_contacts_2(AddressBook *address_book)
 {
-    printf("Testing list_contacts...\n");
+    printf("Testing list_contacts_2...\n");
     if (address_book->count > 0)
     {
         list_contacts_2(address_book, "List of Contacts", NULL, NULL, e_list);
@@ -79,23 +74,33 @@ void test_list_contacts(AddressBook *address_book)
 void test_save_prompt(AddressBook *address_book)
 {
     printf("Testing save_prompt...\n");
-    save_prompt(address_book);
-    printf("Save prompt completed.\n");
+    if (save_prompt(address_book) == e_success)
+    {
+        printf("Save prompt completed successfully.\n");
+    }
+    else
+    {
+        printf("Save prompt failed or canceled.\n");
+    }
 }
 
 int main(void)
 {
     AddressBook address_book;
     address_book.count = 0;
-    address_book.list = (ContactInfo *)malloc(sizeof(ContactInfo) * 100); // Assuming a maximum of 100 contacts
+    address_book.list = (ContactInfo *)malloc(sizeof(ContactInfo) * MAX_CONTACTS); // Allocate memory for contacts
 
-    test_add_contact(&address_book);
-    test_search_contact(&address_book);
-    test_edit_contact(&address_book);
-    test_delete_contact(&address_book);
-    test_list_contacts(&address_book);
+    printf("Starting tests for address_book_menu.c functions...\n");
+
+    test_add_contacts(&address_book);
+    test_search_contact_2(&address_book);
+    test_edit_contact_2(&address_book);
+    test_delete_contact_2(&address_book);
+    test_list_contacts_2(&address_book);
     test_save_prompt(&address_book);
 
-    free(address_book.list);
+    free(address_book.list); // Free allocated memory
+    printf("All tests completed.\n");
+
     return 0;
 }

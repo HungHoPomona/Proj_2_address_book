@@ -21,44 +21,23 @@ void print_contact(const ContactInfo *contact)
     printf("\n");
 }
 
-int main()
+void test_load_file(AddressBook *address_book)
 {
-    AddressBook address_book;
-    address_book.list = (ContactInfo *)malloc(sizeof(ContactInfo) * MAX_CONTACTS); // Allocate memory for contacts
-    address_book.count = 0;
-
-    // Test loading contacts from file
     printf("Testing load_file...\n");
-    if (load_file(&address_book) == e_success)
+    if (load_file(address_book) == e_success)
     {
-        printf("Contacts loaded successfully. Total contacts: %d\n", address_book.count);
+        printf("Contacts loaded successfully. Total contacts: %d\n", address_book->count);
     }
     else
     {
         printf("Failed to load contacts.\n");
     }
+}
 
-    // Test adding a contact
-    printf("\nTesting add_contact...\n");
-    ContactInfo new_contact;
-    memset(&new_contact, 0, sizeof(ContactInfo));
-    strcpy(new_contact.name[0], "John Doe");
-    strcpy(new_contact.phone_numbers[0], "123-456-7890");
-    strcpy(new_contact.email_addresses[0], "john.doe@example.com");
-    new_contact.si_no = address_book.count + 1;
-
-    if (add_contact(&address_book, &new_contact) == e_success)
-    {
-        printf("Contact added successfully.\n");
-    }
-    else
-    {
-        printf("Failed to add contact.\n");
-    }
-
-    // Test saving contacts to file
-    printf("\nTesting save_file...\n");
-    if (save_file(&address_book) == e_success)
+void test_save_file(AddressBook *address_book)
+{
+    printf("Testing save_file...\n");
+    if (save_file(address_book) == e_success)
     {
         printf("Contacts saved successfully.\n");
     }
@@ -66,11 +45,33 @@ int main()
     {
         printf("Failed to save contacts.\n");
     }
+}
 
-    // Test searching for a contact
-    printf("\nTesting search_contact...\n");
+void test_add_contact(AddressBook *address_book)
+{
+    printf("Testing add_contact...\n");
+    ContactInfo new_contact;
+    memset(&new_contact, 0, sizeof(ContactInfo));
+    strcpy(new_contact.name[0], "John Doe");
+    strcpy(new_contact.phone_numbers[0], "123-456-7890");
+    strcpy(new_contact.email_addresses[0], "john.doe@example.com");
+    new_contact.si_no = address_book->count + 1;
+
+    if (add_contact(address_book, &new_contact) == e_success)
+    {
+        printf("Contact added successfully. Total contacts: %d\n", address_book->count);
+    }
+    else
+    {
+        printf("Failed to add contact.\n");
+    }
+}
+
+void test_search_contact(AddressBook *address_book)
+{
+    printf("Testing search_contact...\n");
     ContactInfo search_result;
-    if (search_contact(&address_book, "John Doe", &search_result) == e_success)
+    if (search_contact(address_book, "John Doe", &search_result) == e_success)
     {
         printf("Contact found:\n");
         print_contact(&search_result);
@@ -79,38 +80,84 @@ int main()
     {
         printf("Contact not found.\n");
     }
+}
 
-    // Test editing a contact
-    printf("\nTesting edit_contact...\n");
-    strcpy(new_contact.phone_numbers[0], "098-765-4321");
-    if (edit_contact(&address_book, 0, &new_contact) == e_success)
+void test_edit_contact(AddressBook *address_book)
+{
+    printf("Testing edit_contact...\n");
+    if (address_book->count == 0)
+    {
+        printf("No contacts available to edit.\n");
+        return;
+    }
+
+    ContactInfo updated_contact = address_book->list[0];
+    strcpy(updated_contact.phone_numbers[0], "098-765-4321");
+
+    if (edit_contact(address_book, 0, &updated_contact) == e_success)
     {
         printf("Contact edited successfully.\n");
+        print_contact(&address_book->list[0]);
     }
     else
     {
         printf("Failed to edit contact.\n");
     }
+}
 
-    // Test deleting a contact
-    printf("\nTesting delete_contact...\n");
-    if (delete_contact(&address_book, 0) == e_success)
+void test_delete_contact(AddressBook *address_book)
+{
+    printf("Testing delete_contact...\n");
+    if (address_book->count == 0)
     {
-        printf("Contact deleted successfully.\n");
+        printf("No contacts available to delete.\n");
+        return;
+    }
+
+    if (delete_contact(address_book, 0) == e_success)
+    {
+        printf("Contact deleted successfully. Total contacts: %d\n", address_book->count);
     }
     else
     {
         printf("Failed to delete contact.\n");
     }
+}
 
-    // Test listing all contacts
-    printf("\nTesting list_contacts...\n");
-    list_contacts(&address_book);
+void test_list_contacts(AddressBook *address_book)
+{
+    printf("Testing list_contacts...\n");
+    if (address_book->count > 0)
+    {
+        list_contacts(address_book);
+    }
+    else
+    {
+        printf("No contacts to list.\n");
+    }
+}
 
-    // Free allocated memory
-    printf("\nTesting free_address_book...\n");
-    free_address_book(&address_book);
+void test_free_address_book(AddressBook *address_book)
+{
+    printf("Testing free_address_book...\n");
+    free_address_book(address_book);
     printf("Memory freed successfully.\n");
+}
+
+int main()
+{
+    AddressBook address_book;
+    address_book.list = (ContactInfo *)malloc(sizeof(ContactInfo) * MAX_CONTACTS); // Allocate memory for contacts
+    address_book.count = 0;
+
+    test_load_file(&address_book);
+    test_add_contact(&address_book);
+    test_save_file(&address_book);
+    test_search_contact(&address_book);
+    test_edit_contact(&address_book);
+    test_delete_contact(&address_book);
+    test_list_contacts(&address_book);
+    test_free_address_book(&address_book);
 
     return 0;
 }

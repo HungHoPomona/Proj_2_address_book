@@ -822,7 +822,7 @@ Status delete_contact_2(AddressBook *address_book)
 
                 if (!found)
                 {
-                    printf("No contact found with name '%s'.\n");
+                    printf("No contact found with name '%s'.\n", name);
                 }
                 break;
             }
@@ -856,7 +856,7 @@ Status delete_contact_2(AddressBook *address_book)
 
                 if (!found)
                 {
-                    printf("No contact found with phone number '%s'.\n");
+                    printf("No contact found with phone number '%s'.\n", phone);
                 }
                 break;
             }
@@ -890,15 +890,15 @@ Status delete_contact_2(AddressBook *address_book)
 
                 if (!found)
                 {
-                    printf("No contact found with email address '%s'.\n");
+                    printf("No contact found with email address '%s'.\n", email);
                 }
                 break;
             }
 
             case 4: // Delete by Contact ID
             {
-                int id;
                 printf("Enter the contact ID to delete: ");
+                int id;
                 scanf("%d", &id);
                 getchar(); // Consume newline character
 
@@ -920,14 +920,14 @@ Status delete_contact_2(AddressBook *address_book)
 
                 if (!found)
                 {
-                    printf("No contact found with ID %d.\n");
+                    printf("No contact found with ID %d.\n", id);
                 }
                 break;
             }
 
-            case 0: // Done
-                printf("Finished deleting contacts. Return to main menu.\n");
-                break;
+            case 0: // Back to Main Menu
+                printf("Returning to main menu.\n");
+                return e_success;
 
             default:
                 printf("Invalid option. Try again.\n");
